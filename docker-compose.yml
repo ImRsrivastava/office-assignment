@@ -1,28 +1,26 @@
 version: "3"
 services:
-    frontend:
+    client:
         build: 
-            context: ./frontend
+            context: ./client
             dockerfile: Dockerfile
-        container_name: frontend_cont
+        container_name: client_cont
         ports:
             - 3005:3000
         volumes:
-            - ./frontend:/var/www/html/frontend
+            - ./client:/var/www/html/client
         depends_on:
-            - backend
-        networks:
-            - front_network
+            - server
 
-    backend:
+    server:
         build: 
-            context: ./backend
+            context: ./server
             dockerfile: Dockerfile
-        container_name: backend_cont
+        container_name: server_cont
         ports:
             - 5000:5000
         volumes:
-            - ./backend:/var/www/html/backend
+            - ./server:/var/www/html/server
         environment:
             - MYSQL_HOST=mysql
             - MYSQL_USERNAME=root
@@ -31,8 +29,6 @@ services:
             - MYSQL_PORT=3307
         depends_on:
             - database
-        networks:
-            - back_network
 
     database:
         image: mysql:latest
@@ -45,11 +41,4 @@ services:
         volumes:
             - ./initdb:/docker-entrypoint-initdb.d
         command: ["--default-authentication-plugin", "mysql_native_password"]
-        networks:
-            - back_network
 
-networks:
-    front_network:
-        driver: bridge
-    back_network:
-        driver: bridge
